@@ -1,0 +1,141 @@
+<!doctype html><html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#08182b"><title>Hokejová násobilka</title><link rel="manifest" href="manifest.webmanifest"><style>
+:root{font-family:system-ui,-apple-system,Arial,sans-serif;color:#fff;background:#071729}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#23486b,#071729 65%);min-height:100vh}main{max-width:860px;margin:auto;padding:20px 16px 60px}header{text-align:center;padding:12px}h1{font-size:clamp(28px,6vw,48px);margin:8px 0}h2{margin:8px 0 16px}.sub{color:#a8c2da}.panel{background:#102b47;border:1px solid #365875;border-radius:20px;padding:22px;margin-top:16px;box-shadow:0 12px 35px #0004}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.field{display:flex;flex-direction:column;gap:7px}label{font-weight:700}select,button,input{font:inherit}select{background:#edf5ff;color:#112b46;padding:13px;border-radius:12px;border:0;width:100%}button{cursor:pointer;border:0;border-radius:13px;padding:15px 18px;font-weight:800;touch-action:manipulation}button:disabled{opacity:.45;cursor:default}.primary{background:#f6b936;color:#10243a}.secondary{background:#2c5376;color:white}.wide{width:100%;margin-top:18px}.scoreboard{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;text-align:center}.score{font-size:clamp(34px,8vw,70px);font-weight:950;white-space:nowrap}.team{font-size:clamp(13px,3vw,22px);font-weight:850}.crest{overflow:hidden;width:66px;height:66px;border-radius:18px;display:grid;place-items:center;margin:0 auto 8px;font-size:32px;border:3px solid #ffffff44;background:#204f7b}.crest img{width:100%;height:100%;object-fit:contain}.team-preview{display:flex;align-items:center;gap:12px;margin-top:10px}.team-preview img{width:58px;height:58px}.meta{text-align:center;color:#b8d3ea;margin:18px 0}.question{text-align:center;font-size:clamp(48px,11vw,82px);font-weight:900;margin:14px 0}.timer{height:13px;border-radius:20px;background:#3e5a71;overflow:hidden}.timer>div{height:100%;background:#f6b936;width:100%;transition:width .08s linear}.answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:22px}.answers button,.pad button{background:#e8f2ff;color:#102c49;font-size:clamp(25px,6vw,38px);min-height:75px}.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:14px}.pad button{min-height:58px}.entry{text-align:center;font-size:42px;min-height:55px;font-weight:800}.notice{text-align:center;min-height:36px;font-size:22px;font-weight:800}.hidden{display:none!important}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}.stats div{background:#214360;border-radius:12px;padding:14px 5px}.stats strong{display:block;font-size:25px}.small{font-size:13px;color:#b4cee4}.pill{display:inline-block;padding:6px 12px;background:#234867;border-radius:20px}.history{max-height:230px;overflow:auto;font-size:14px}.history div{padding:7px;border-bottom:1px solid #ffffff22}.help{font-size:14px;color:#c5daec} @media(max-width:540px){.grid{grid-template-columns:1fr}.panel{padding:16px}.crest{width:52px;height:52px;font-size:26px}.score{font-size:36px}.stats{gap:5px}}
+</style></head><body><main><header><div class="pill">🏒 HOKEJOVÁ MATEMATIKA</div><h1>Hokejová násobilka</h1><div class="sub">Matematické derby inspirované českou první ligou</div></header>
+<section id="setup" class="panel"><h2>🏟️ Předzápasová příprava</h2><div class="grid"><div class="field"><label for="team">Můj tým</label><select id="team"></select><div id="teamPreview" class="team-preview"></div></div><div class="field"><label for="table">Násobilka</label><select id="table"><option value="all">Všechny (1–10)</option></select></div><div class="field"><label for="operation">Příklady</label><select id="operation"><option value="mix">Násobení i dělení</option><option value="mul">Pouze násobení</option><option value="div">Pouze dělení</option></select></div><div class="field"><label for="mode">Typ zápasu</label><select id="mode"><option value="league">Jednotlivý mistrovský zápas</option><option value="season">🏆 Liga – celá sezóna</option><option value="friendly">Přípravný zápas (bez času)</option></select></div><div class="field"><label for="difficulty">Obtížnost</label><select id="difficulty"><option value="10">Lehká – 10 sekund</option><option value="7.5">Střední – 7,5 sekundy</option><option value="5">Těžká – 5 sekund</option></select></div><div class="field"><label for="inputMode">Odpovídání</label><select id="inputMode"><option value="choices">4 nabídnuté odpovědi</option><option value="keypad">Číselná klávesnice</option></select></div></div><p class="help">3 třetiny × 10 příkladů. Správně = gól pro tebe, špatně nebo vypršení času = gól soupeře. Při remíze následuje prodloužení na zlatý gól.</p><label style="display:flex;gap:10px;align-items:center;margin-top:16px"><input id="soundEnabled" type="checkbox" checked style="width:22px;height:22px"> Zapnout zvuky (gólový pokřik a siréna)</label><button id="start" class="primary wide">🏒 VYJET NA LED</button><div id="seasonPanel" class="panel hidden"><h3>🏆 Moje liga</h3><div id="seasonInfo"></div><button id="resetSeason" class="secondary wide">Začít novou sezónu</button></div><button id="records" class="secondary wide">📊 Historie zápasů</button><div id="recordList" class="history hidden"></div></section>
+<section id="game" class="hidden"><div class="panel"><div class="scoreboard"><div><div id="homeCrest" class="crest">🏒</div><div id="homeName" class="team"></div></div><div><div class="score"><span id="homeScore">0</span> : <span id="awayScore">0</span></div><div class="small" id="period">1. třetina</div></div><div><div id="awayCrest" class="crest">🥅</div><div id="awayName" class="team"></div></div></div><div class="meta" id="progress"></div></div><div class="panel"><div id="notice" class="notice"></div><div id="question" class="question"></div><div id="timerWrap"><div class="timer"><div id="timerFill"></div></div><p class="small" style="text-align:center" id="timerText"></p></div><div id="choices" class="answers"></div><div id="keypadWrap" class="hidden"><div id="entry" class="entry">?</div><div id="keypad" class="pad"></div></div></div><button id="quit" class="secondary wide">Ukončit zápas</button></section>
+<section id="result" class="panel hidden"><h2 id="resultTitle" style="text-align:center"></h2><div id="resultScore" class="question"></div><div class="stats"><div><strong id="correctCount"></strong><span>Správně</span></div><div><strong id="wrongCount"></strong><span>Chybně</span></div><div><strong id="accuracy"></strong><span>Úspěšnost</span></div></div><h3>Rozbor příkladů</h3><div id="review" class="history"></div><button id="again" class="primary wide">Hrát další zápas</button></section></main>
+<script>
+const teams=[['Berani Zlín','#f1c62d'],['VHK ROBE Vsetín','#f5d12b'],['HC Dukla Jihlava','#c72836'],['HC ZUBR Přerov','#d3b65a'],['HC Stadion Litoměřice','#d53a37'],['HC Slavia Praha','#cc1c2b'],['HC Baník Sokolov','#f4c934'],['HC Frýdek-Místek','#d73535'],['AZ Havířov','#182e55'],['HC Dynamo Pardubice B','#bd2835'],['HC Tábor','#c82432'],['SK Horácká Slavia Třebíč','#d52b32'],['Piráti Chomutov','#efc52e'],['SC Retia Kolín','#d52a32']];
+// Skutečné klubové znaky dodané uživatelem.
+const logoFiles=["zlin", "vsetin", "jihlava", "prerov", "litomerice", "slavia", "sokolov", "frydek", "havirov", "pardubice", "tabor", "trebic", "chomutov", "kolin"];
+function crestUrl(i){return './loga/'+logoFiles[i]+'.png'}
+function previewTeam(){const i=+$('team').value;$('teamPreview').innerHTML=`<img src="${crestUrl(i)}" alt="Emblém týmu"><strong>${teams[i][0]}</strong>`}
+let audioCtx=null;
+function unlockAudio(){try{audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}catch{}}
+function siren(){if(!$('soundEnabled').checked)return;try{unlockAudio();if(!audioCtx)return;const t=audioCtx.currentTime,osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.type='sawtooth';osc.connect(gain);gain.connect(audioCtx.destination);gain.gain.setValueAtTime(.0001,t);gain.gain.linearRampToValueAtTime(.14,t+.04);for(let j=0;j<5;j++){osc.frequency.setValueAtTime(420,t+j*.22);osc.frequency.linearRampToValueAtTime(740,t+j*.22+.11);osc.frequency.linearRampToValueAtTime(420,t+(j+1)*.22)}gain.gain.setValueAtTime(.14,t+1.02);gain.gain.exponentialRampToValueAtTime(.0001,t+1.12);osc.start(t);osc.stop(t+1.13)}catch{}}
+const goalClip=new Audio('./audio/gol.mp3');goalClip.preload='auto';
+function goalSound(){if(!$('soundEnabled').checked)return;try{goalClip.pause();goalClip.currentTime=0;goalClip.play().catch(()=>{});}catch{}}
+
+const $=id=>document.getElementById(id);const rand=n=>Math.floor(Math.random()*n);let state=null,raf=0,timeout=0,locked=false,answerBuffer='';
+const seasonKey='hokejMathSeasonV2';
+function getSeason(){try{return JSON.parse(localStorage.getItem(seasonKey)||'null')}catch{return null}}
+function saveSeason(x){try{localStorage.setItem(seasonKey,JSON.stringify(x))}catch{}}
+function createSeason(home){
+  const others=teams.map((_,i)=>i).filter(i=>i!==home);
+  for(let i=others.length-1;i>0;i--){const j=rand(i+1);[others[i],others[j]]=[others[j],others[i]]}
+  const schedule=[...others,...others.slice().reverse()];
+  return {home,schedule,index:0,results:[],playoff:null,points:Array(teams.length).fill(0),goals:Array(teams.length).fill(0),against:Array(teams.length).fill(0)};
+}
+function ranking(season){return teams.map((_,i)=>i).sort((a,b)=>season.points[b]-season.points[a]||(season.goals[b]-season.against[b])-(season.goals[a]-season.against[a])||season.goals[b]-season.goals[a])}
+function initPlayoff(season){
+ const top=ranking(season).slice(0,8);
+ season.playoff={round:0,series:[{a:top[0],b:top[7],wins:[0,0]},{a:top[3],b:top[4],wins:[0,0]},{a:top[1],b:top[6],wins:[0,0]},{a:top[2],b:top[5],wins:[0,0]}],champion:null,eliminated:false};
+}
+function simulateSeries(series){while(Math.max(...series.wins)<2){const winner=rand(2);series.wins[winner]++}return series.wins[0]>series.wins[1]?series.a:series.b}
+function advancePlayoff(season){
+ const p=season.playoff;
+ if(p.series.some(s=>Math.max(...s.wins)<2))return;
+ const winners=p.series.map(s=>s.wins[0]>s.wins[1]?s.a:s.b);
+ if(p.round===2){p.champion=winners[0];return}
+ p.round++;
+ p.series=p.round===1?[{a:winners[0],b:winners[1],wins:[0,0]},{a:winners[2],b:winners[3],wins:[0,0]}]:[{a:winners[0],b:winners[1],wins:[0,0]}];
+}
+function nextPlayoffSeries(season){
+ const p=season.playoff;
+ if(!p||p.champion!==null||p.eliminated)return null;
+ let series=p.series.find(s=>s.a===season.home||s.b===season.home);
+ if(!series){p.eliminated=true;saveSeason(season);return null}
+ return series;
+}
+function applyPlayoffResult(season,h,a){
+ const p=season.playoff,series=nextPlayoffSeries(season);if(!series)return;
+ const winner=h>a?season.home:state.away;
+ series.wins[winner===series.a?0:1]++;
+ if(Math.max(...series.wins)>=2){
+  const won=series.wins[series.a===season.home?0:1]>=2;
+  for(const other of p.series){if(other!==series)simulateSeries(other)}
+  if(!won)p.eliminated=true;
+  else advancePlayoff(season);
+ }
+ saveSeason(season);
+}
+function leaguePanel(){
+  const selected=+$('team').value,season=getSeason();
+  const active=season&&season.home===selected;
+  $('seasonPanel').classList.toggle('hidden',$('mode').value!=='season');
+  if($('mode').value!=='season')return;
+  const el=$('seasonInfo');el.replaceChildren();
+  const intro=document.createElement('p');
+  intro.textContent=!active?'Nová sezóna: 26 kol, poté play-off osmi nejlepších.':season.index<season.schedule.length?`Základní část: kolo ${season.index+1} z ${season.schedule.length} • soupeř: ${teams[season.schedule[season.index]][0]}`:!season.playoff?'Základní část dokončena. Připraveno play-off!':season.playoff.champion!==null?`🏆 MISTR LIGY: ${teams[season.playoff.champion][0]}`:season.playoff.eliminated?'Sezóna skončila vyřazením v play-off.':`🏒 ${['ČTVRTFINÁLE','SEMIFINÁLE','FINÁLE'][season.playoff.round]} • série na 2 vítězství`;
+  if(active&&season.playoff){const p=season.playoff;const heading=document.createElement('h3');heading.textContent='🏆 Pavouk play-off';el.append(heading);const round=document.createElement('p');round.textContent=['Čtvrtfinále','Semifinále','Finále'][p.round];el.append(round);for(const series of p.series){const d=document.createElement('div');d.style.padding='7px';d.textContent=`${teams[series.a][0]} ${series.wins[0]} : ${series.wins[1]} ${teams[series.b][0]}`;el.append(d)}if(p.champion===season.home){const trophy=document.createElement('div');trophy.style.cssText='font-size:42px;text-align:center;padding:16px';trophy.textContent='🏆 MISTR MAXA MATEMATICKÉ LIGY 🏆';el.append(trophy)}}
+  el.append(intro);
+  if(active&&season.results.length){
+    const table=document.createElement('table');table.style.width='100%';
+    table.innerHTML='<thead><tr><th style="text-align:left">Tým</th><th>Body</th><th>Skóre</th></tr></thead>';
+    const order=ranking(season);
+    for(const i of order){const tr=document.createElement('tr');[teams[i][0],String(season.points[i]),`${season.goals[i]}:${season.against[i]}`].forEach((v,j)=>{const td=document.createElement('td');td.textContent=v;td.style.padding='5px';if(j)td.style.textAlign='center';tr.append(td)});if(i===selected)tr.style.background='#315b77';table.append(tr)}
+    el.append(table);
+  }
+  const ended=active&&season.index>=season.schedule.length&&season.playoff&&(season.playoff.champion!==null||season.playoff.eliminated);
+  $('start').disabled=!!ended;
+  $('start').textContent=ended?'🏆 SEZÓNA UKONČENA':active&&season.index>=season.schedule.length?'🏆 HRÁT PLAY-OFF':active?'🏒 HRÁT DALŠÍ KOLO':'🏆 ZAČÍT LIGU';
+}
+$('mode').addEventListener('change',leaguePanel);
+$('team').addEventListener('change',leaguePanel);
+$('resetSeason').onclick=()=>{if(confirm('Opravdu smazat rozehranou sezónu?')){localStorage.removeItem(seasonKey);leaguePanel()}};
+
+for(let i=0;i<teams.length;i++)$('team').add(new Option(teams[i][0],i));for(let i=1;i<=10;i++)$('table').add(new Option('Násobilka '+i,i));$('team').addEventListener('change',previewTeam);previewTeam();
+function show(id){for(const x of ['setup','game','result'])$(x).classList.toggle('hidden',x!==id)}
+function start(){unlockAudio();goalClip.load();const home=+$('team').value;
+let season=null,away;
+if($('mode').value==='season'){
+ season=getSeason();
+ if(!season||season.home!==home){season=createSeason(home);saveSeason(season)}
+ if(season.index>=season.schedule.length){
+   if(!season.playoff){initPlayoff(season);saveSeason(season)}
+   const series=nextPlayoffSeries(season);
+   if(!series){leaguePanel();return}
+   away=series.a===home?series.b:series.a;
+ }else away=season.schedule[season.index];
+}else{away=rand(teams.length-1);if(away>=home)away++}
+state={home,away,table:$('table').value,op:$('operation').value,mode:$('mode').value,season:season!==null,limit:parseFloat($('difficulty').value),input:$('inputMode').value,score:[0,0],round:0,log:[],overtime:false,used:new Set()};$('homeName').textContent=teams[home][0];$('awayName').textContent=teams[away][0];for(const [id,i] of [['homeCrest',home],['awayCrest',away]]){$(id).style.background=teams[i][1];$(id).innerHTML=`<img src="${crestUrl(i)}" alt="Emblém ${teams[i][0]}">`}$('choices').classList.toggle('hidden',state.input!=='choices');$('keypadWrap').classList.toggle('hidden',state.input!=='keypad');$('timerWrap').classList.toggle('hidden',state.mode==='friendly');show('game');next()}
+function newProblem(){let a,b,op,key;for(let tries=0;tries<200;tries++){a=state.table==='all'?rand(10)+1:+state.table;b=rand(10)+1;op=state.op==='mix'?(rand(2)?'mul':'div'):state.op;key=[a,b,op].join(':');if(!state.used.has(key))break}state.used.add(key);if(state.used.size>=190)state.used.clear();return op==='mul'?{text:`${a} × ${b}`,answer:a*b}:{text:`${a*b} ÷ ${a}`,answer:b}}
+function alternatives(correct){let set=new Set([correct]);let near=[correct-10,correct+10,correct-1,correct+1,correct-2,correct+2,correct*2,Math.floor(correct/2)].filter(n=>n>=0&&n<=100&&n!==correct);while(set.size<4){let n=near.length?near.splice(rand(near.length),1)[0]:rand(101);set.add(n)}return [...set].sort(()=>Math.random()-.5)}
+function stopTimer(){cancelAnimationFrame(raf);clearTimeout(timeout)}
+function next(){stopTimer();locked=false;answerBuffer='';$('entry').textContent='?';$('notice').textContent='';$('homeScore').textContent=state.score[0];$('awayScore').textContent=state.score[1];$('period').textContent=state.overtime?'PRODLOUŽENÍ':`${Math.floor(state.round/10)+1}. třetina`;$('progress').textContent=state.overtime?'Zlatý gól rozhoduje':`Příklad ${state.round+1} z 30`;state.problem=newProblem();$('question').textContent=state.problem.text+' = ?';$('choices').innerHTML='';if(state.input==='choices'){for(const v of alternatives(state.problem.answer)){let btn=document.createElement('button');btn.textContent=v;btn.onclick=()=>submit(v);$('choices').append(btn)}}else renderPad();if(state.mode!=='friendly'){const startTime=performance.now(),duration=state.limit*1000;function tick(now){if(locked)return;const left=Math.max(0,duration-(now-startTime));$('timerFill').style.width=(left/duration*100)+'%';$('timerText').textContent=(left/1000).toFixed(1).replace('.',',')+' s';if(left<=0)submit(null);else raf=requestAnimationFrame(tick)}raf=requestAnimationFrame(tick)}}
+function renderPad(){const pad=$('keypad');pad.innerHTML='';for(const v of ['1','2','3','4','5','6','7','8','9','⌫','0','✓']){const btn=document.createElement('button');btn.textContent=v;btn.onclick=()=>{if(locked)return;if(v==='⌫')answerBuffer=answerBuffer.slice(0,-1);else if(v==='✓'){if(answerBuffer!=='')submit(+answerBuffer);return}else if(answerBuffer.length<3)answerBuffer+=v;$('entry').textContent=answerBuffer||'?'};pad.append(btn)}}
+function submit(v){if(locked)return;locked=true;stopTimer();const ok=v===state.problem.answer;if(ok)goalSound();else siren();state.score[ok?0:1]++;state.log.push({question:state.problem.text,answer:state.problem.answer,given:v,ok});$('homeScore').textContent=state.score[0];$('awayScore').textContent=state.score[1];$('notice').textContent=ok?'🥅 GÓÓÓL!':'🛑 Gól soupeře! Správně: '+state.problem.answer;$('notice').style.color=ok?'#7df2a2':'#ffb3b3';timeout=setTimeout(()=>{if(state.overtime){finish();return}state.round++;if(state.round>=30){if(state.score[0]===state.score[1]){state.overtime=true;next()}else finish()}else next()},850)}
+function announceResult(h,a){
+ if(!$('soundEnabled').checked)return;
+ try{
+   window.speechSynthesis.cancel();
+   const u=new SpeechSynthesisUtterance(`Konec zápasu. ${teams[state.home][0]}, ${h}. ${teams[state.away][0]}, ${a}. ${h>a?'Vítězí '+teams[state.home][0]:h<a?'Vítězí '+teams[state.away][0]:'Remíza'}.`);
+   u.lang='cs-CZ';u.rate=.88;u.pitch=1;const cz=window.speechSynthesis.getVoices().find(v=>v.lang.toLowerCase().startsWith('cs'));if(cz)u.voice=cz;
+   window.speechSynthesis.speak(u);
+ }catch{}
+}
+function finish(){stopTimer();const [h,a]=state.score;
+if(state.season){
+ const season=getSeason();
+ if(season&&season.home===state.home&&season.index>=season.schedule.length&&season.playoff){
+   applyPlayoffResult(season,h,a);
+ }else if(season&&season.home===state.home&&season.schedule[season.index]===state.away){
+   season.results.push({home:state.home,away:state.away,h,a});
+   season.goals[state.home]+=h;season.against[state.home]+=a;
+   season.goals[state.away]+=a;season.against[state.away]+=h;
+   season.points[h>a?state.home:state.away]+=3;
+   // Ostatní týmy hrají v každém kole simulované zápasy.
+   const remaining=teams.map((_,i)=>i).filter(i=>i!==state.home&&i!==state.away);
+   for(let j=remaining.length-1;j>0;j--){let k=rand(j+1);[remaining[j],remaining[k]]=[remaining[k],remaining[j]]}
+   for(let j=0;j+1<remaining.length;j+=2){const x=remaining[j],y=remaining[j+1],gx=rand(6)+1,gy=rand(6)+1;
+      season.goals[x]+=gx;season.against[x]+=gy;season.goals[y]+=gy;season.against[y]+=gx;
+      if(gx===gy){season.points[x]+=1;season.points[y]+=1}else season.points[gx>gy?x:y]+=3;
+   }
+   season.index++;if(season.index===season.schedule.length)initPlayoff(season);saveSeason(season);
+ }
+}
+announceResult(h,a);
+$('resultTitle').textContent=h>a?'🏆 VÍTĚZSTVÍ!':'🏒 KONEC ZÁPASU';$('resultScore').textContent=h+' : '+a;const correct=state.log.filter(x=>x.ok).length;$('correctCount').textContent=correct;$('wrongCount').textContent=state.log.length-correct;$('accuracy').textContent=Math.round(correct/state.log.length*100)+' %';$('review').innerHTML='';for(const x of state.log){let d=document.createElement('div');d.textContent=(x.ok?'✅ ':'❌ ')+x.question+' = '+x.answer+(x.ok?'':' (odpověď: '+(x.given??'čas vypršel')+')');$('review').append(d)}try{let history=JSON.parse(localStorage.getItem('hokejMathHistory')||'[]');history.unshift({date:new Date().toLocaleDateString('cs-CZ'),home:teams[state.home][0],away:teams[state.away][0],score:h+':'+a,accuracy:Math.round(correct/state.log.length*100),mode:state.mode});localStorage.setItem('hokejMathHistory',JSON.stringify(history.slice(0,30)))}catch{}show('result')}
+$('start').onclick=start;$('again').onclick=()=>{show('setup');leaguePanel()};$('quit').onclick=()=>{if(confirm('Opravdu ukončit rozehraný zápas?')){stopTimer();locked=true;try{window.speechSynthesis.cancel()}catch{}show('setup')}};$('records').onclick=()=>{const box=$('recordList');box.classList.toggle('hidden');if(box.classList.contains('hidden'))return;let records=[];try{records=JSON.parse(localStorage.getItem('hokejMathHistory')||'[]')}catch{}box.innerHTML='';if(!records.length)box.textContent='Zatím nejsou odehrané zápasy.';for(const r of records){const d=document.createElement('div');d.textContent=`${r.date} • ${r.home} – ${r.away} ${r.score} • ${r.accuracy} %`;box.append(d)}};
+leaguePanel();if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script></body></html>
